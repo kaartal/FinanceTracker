@@ -6,6 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import javax.swing.*;
 import java.util.*;
 
 public class TransactionManager {
@@ -54,7 +55,8 @@ public class TransactionManager {
     }
 
 
-    // EXPENSE LIST BY CATEGORIES
+
+    // EXPENSE LIST FOR EXPORT BY CATEGORIES
     public Map<String, Double> getExpenseByCategory() {
 
         String[] categories = {"Plata", "Hrana", "Racuni", "Zabava", "Prijevoz", "Ostalo"};Map<String, Double> result = new LinkedHashMap<>();
@@ -79,7 +81,7 @@ public class TransactionManager {
 
 
 
-    // INCOME LIST BY CATEGORIES
+    // INCOME LIST FOR EXPORT BY CATEGORIES
     public Map<String, Double> getIncomesByCategory() {
 
         String[] categories = {"Plata", "Hrana", "Racuni", "Zabava", "Prijevoz", "Ostalo"};
@@ -93,32 +95,16 @@ public class TransactionManager {
                 String cat = (t.getCategory() != null ? t.getCategory() : "Ostalo");
 
                 if (result.containsKey(cat)) {
+
                     result.put(cat, result.get(cat) + t.getAmount());
-                } else {
+                }
+                else {
                     result.put("Ostalo", result.get("Ostalo") + t.getAmount());
                 }
             }
         }
-
         return result;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -134,6 +120,7 @@ public class TransactionManager {
 
         collection.updateOne(filter, updated);
     }
+
 
     public void deleteTransaction(String id) {
         Document filter = new Document("_id", new ObjectId(id));
