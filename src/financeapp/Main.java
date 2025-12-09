@@ -1,6 +1,6 @@
 package financeapp;
 import javax.swing.*;
-public class Main {
+public class  Main {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Finance Tracker");
         FinanceTrackerForm form = new FinanceTrackerForm();

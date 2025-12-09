@@ -27,19 +27,20 @@ public class TransactionManager {
         MongoCursor<Document> cursor = collection.find().iterator();
 
         while (cursor.hasNext()) {
-            Document d = cursor.next();
+            Document docTemplate = cursor.next();
             list.add(new Transaction(
-                    d.getObjectId("_id").toHexString(),
-                    d.getString("Vrsta"),
-                    d.getDouble("Iznos"),
-                    d.getString("Opis"),
-                    d.getString("Kategorija")
+                    docTemplate.getObjectId("_id").toHexString(),
+                    docTemplate.getString("Vrsta"),
+                    docTemplate.getDouble("Iznos"),
+                    docTemplate.getString("Opis"),
+                    docTemplate.getString("Kategorija")
             ));
         }
-
         return list;
     }
 
+
+    // RETURN SUM OF ALL INCOME TRANSACTIONS
     public double getTotalIncome() {
         return getAllTransactions().stream()
                 .filter(t -> t.getType().equalsIgnoreCase("Prihod"))
@@ -47,6 +48,7 @@ public class TransactionManager {
                 .sum();
     }
 
+    // RETURN SUM OF ALL EXPENSE TRANSACTION
     public double getTotalExpense() {
         return getAllTransactions().stream()
                 .filter(t -> t.getType().equalsIgnoreCase("Rashod"))
@@ -59,55 +61,49 @@ public class TransactionManager {
     // EXPENSE LIST FOR EXPORT BY CATEGORIES
     public Map<String, Double> getExpenseByCategory() {
 
-        String[] categories = {"Plata", "Hrana", "Racuni", "Zabava", "Prijevoz", "Ostalo"};Map<String, Double> result = new LinkedHashMap<>();
-
-        for (String cat : categories) result.put(cat, 0.0);
-
-        for (Transaction t : getAllTransactions()) {
-            if (t.getType() != null && t.getType().equalsIgnoreCase("Rashod")) {
-
-                String cat = (t.getCategory() != null ? t.getCategory() : "Ostalo");
-
-                if (result.containsKey(cat)) {
-                    result.put(cat, result.get(cat) + t.getAmount());
-                } else {
-                    result.put("Ostalo", result.get("Ostalo") + t.getAmount());
-                }
-            }
-        }
-
-        return result;
-    }
-
-
-
-    // INCOME LIST FOR EXPORT BY CATEGORIES
-    public Map<String, Double> getIncomesByCategory() {
-
         String[] categories = {"Plata", "Hrana", "Racuni", "Zabava", "Prijevoz", "Ostalo"};
         Map<String, Double> result = new LinkedHashMap<>();
 
         for (String cat : categories) result.put(cat, 0.0);
 
         for (Transaction t : getAllTransactions()) {
-            if (t.getType() != null && t.getType().equalsIgnoreCase("Prihod")) {
+            if ("Rashod".equalsIgnoreCase(t.getType())) {
 
-                String cat = (t.getCategory() != null ? t.getCategory() : "Ostalo");
+                String cat = t.getCategory();
+                if (cat == null || !result.containsKey(cat))
+                    cat = "Ostalo";
 
-                if (result.containsKey(cat)) {
-
-                    result.put(cat, result.get(cat) + t.getAmount());
-                }
-                else {
-                    result.put("Ostalo", result.get("Ostalo") + t.getAmount());
-                }
+                result.put(cat, result.get(cat) + t.getAmount());
             }
         }
+
         return result;
     }
 
+    // INCOME LIST FOR EXPORT BY CATEGORIES
+    public Map<String, Double> getIncomesByCategory() {
+
+        Map<String, Double> result = new LinkedHashMap<>();
+        String[] categories = {"Plata", "Hrana", "Racuni", "Zabava", "Prijevoz", "Ostalo"};
 
 
+        for (String cat : categories) result.put(cat, 0.0);
+
+        for (Transaction t : getAllTransactions()) {
+            if ("Prihod".equalsIgnoreCase(t.getType())) {
+
+                String cat = t.getCategory();
+                if (cat == null || !result.containsKey(cat))
+                    cat = "Ostalo";
+
+                result.put(cat, result.get(cat) + t.getAmount());
+            }
+        }
+
+        return result;
+    }
+
+    // UPDATE TRANSACTION, USER CAN INPUT NEW TYPE, AMOUNT, DESCRIPTION AND CATEGORY. ID SAME.
     public void updateTransaction(Transaction t) {
         Document filter = new Document("_id", new ObjectId(t.getId()));
 
@@ -121,12 +117,12 @@ public class TransactionManager {
         collection.updateOne(filter, updated);
     }
 
-
-    public void deleteTransaction(String id) {
-        Document filter = new Document("_id", new ObjectId(id));
-        collection.deleteOne(filter);
+    // DELETE ALL MARKED TRANSACTION FROM PANEL
+    public void deleteMarkedTransaction(String id) {
+        collection.deleteOne(new Document("_id", new ObjectId(id)));
     }
 
+    // DELETE ALL TRANSACTION FROM PANEL
     public void deleteAllTransactions() {
         collection.deleteMany(new Document());
     }
