@@ -39,24 +39,28 @@ public class TransactionManager {
         return list;
     }
 
-
     // RETURN SUM OF ALL INCOME TRANSACTIONS
     public double getTotalIncome() {
-        return getAllTransactions().stream()
-                .filter(t -> t.getType().equalsIgnoreCase("Prihod"))
-                .mapToDouble(Transaction::getAmount)
-                .sum();
+        double totalAmount = 0;
+        for (Transaction t : getAllTransactions()) {
+            if (t.getType().equalsIgnoreCase("Prihod")) {
+                totalAmount += t.getAmount();} // SUM ALL INCOME FROM DB
+        }
+
+
+        return totalAmount;
     }
 
     // RETURN SUM OF ALL EXPENSE TRANSACTION
     public double getTotalExpense() {
-        return getAllTransactions().stream()
-                .filter(t -> t.getType().equalsIgnoreCase("Rashod"))
-                .mapToDouble(Transaction::getAmount)
-                .sum();
+        double total = 0;
+
+        for (Transaction t : getAllTransactions()) {
+            if (t.getType().equalsIgnoreCase("Rashod")) {
+                total += t.getAmount();} // SUM ALL EXPENSE FROM DB
+        }
+        return total;
     }
-
-
 
     // EXPENSE LIST FOR EXPORT BY CATEGORIES
     public Map<String, Double> getExpenseByCategory() {
@@ -76,7 +80,6 @@ public class TransactionManager {
                 result.put(cat, result.get(cat) + t.getAmount());
             }
         }
-
         return result;
     }
 
@@ -86,9 +89,7 @@ public class TransactionManager {
         Map<String, Double> result = new LinkedHashMap<>();
         String[] categories = {"Plata", "Hrana", "Racuni", "Zabava", "Prijevoz", "Ostalo"};
 
-
         for (String cat : categories) result.put(cat, 0.0);
-
         for (Transaction t : getAllTransactions()) {
             if ("Prihod".equalsIgnoreCase(t.getType())) {
 
@@ -107,11 +108,11 @@ public class TransactionManager {
     public void updateTransaction(Transaction t) {
         Document filter = new Document("_id", new ObjectId(t.getId()));
 
-        Document updated = new Document("$set",
-                new Document("Vrsta", t.getType())
-                        .append("Iznos", t.getAmount())
-                        .append("Opis", t.getDescription())
-                        .append("Kategorija", t.getCategory())
+        Document updated = new Document("$set", new Document()
+                .append("Vrsta", t.getType())
+                .append("Iznos", t.getAmount())
+                .append("Opis", t.getDescription())
+                .append("Kategorija", t.getCategory())
         );
 
         collection.updateOne(filter, updated);

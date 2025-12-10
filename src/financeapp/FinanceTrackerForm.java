@@ -134,7 +134,6 @@ public class FinanceTrackerForm {
         return rowData;
     }
 
-
     private JButton createModernButton(String text, Color bgColor) {
         JButton buttonDisplay = new JButton(text);
         buttonDisplay.setFocusPainted(false);
@@ -213,7 +212,6 @@ public JPanel getMainPanel() {
             }
         }
 
-
         // UPDATE SELECTED TRANSACTION, USER CAN ENTER NEW VALUES TYPE, AMOUNT, DESCRIBE, CATEGORY, ID SAME
         private void updateSelectedTransaction() {
             int row = transactionTableSection.getSelectedRow();
@@ -231,7 +229,7 @@ public JPanel getMainPanel() {
             updateSummary();
         }
 
-        //    DELETE SELECT TRANSACTIONS FROM PANEL
+        //    DELETE SELECTED TRANSACTIONS FROM PANEL
         private void deleteSelectedTransactions() {
             int rowCount = transactionTableSection.getRowCount();
             boolean anyChecked = false;
