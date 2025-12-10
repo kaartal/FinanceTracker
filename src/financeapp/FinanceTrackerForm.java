@@ -98,7 +98,7 @@ public class FinanceTrackerForm {
         mainPanel.add(summaryPanel, BorderLayout.SOUTH);
 
 
-        addTransactionButton.addActionListener(e -> addTransaction());
+        addTransactionButton.addActionListener(e -> addNewTransaction());
         updateButton.addActionListener(e -> updateSelectedTransaction());
         deleteButton.addActionListener(e -> deleteSelectedTransactions());
         deleteAllTransactionButton.addActionListener(e -> deleteAllTransactions());
@@ -182,7 +182,7 @@ public JPanel getMainPanel() {
         }
 
         // ADD NEW TRANSACTION TO DB, USER ENTER TYPE, AMOUNT, DESCRIBE, CATEGORY. ID INCREMENT FOR NEW TRANSACTION
-        private void addTransaction() {
+        private void addNewTransaction() {
             try {
                 String type = (String) typeDropdownMenu.getSelectedItem();
                 double amount = Double.parseDouble(amountField.getText());
@@ -199,7 +199,7 @@ public JPanel getMainPanel() {
                     return;
                 }
 
-                manager.addTransaction(new Transaction(type, amount, description, category));
+                manager.addNewTransaction(new Transaction(type, amount, description, category));
 
                 loadDataIntoTable();
                 updateSummary();
@@ -223,7 +223,7 @@ public JPanel getMainPanel() {
             String desc = descriptionField.getText();
             String category = (String) categoryCombo.getSelectedItem();
 
-            manager.updateTransaction(new Transaction(id, type, amount, desc, category));
+            manager.updateSelectedTransaction(new Transaction(id, type, amount, desc, category));
 
             loadDataIntoTable();
             updateSummary();

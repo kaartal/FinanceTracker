@@ -18,7 +18,7 @@ public class TransactionManager {
         collection = db.getCollection("transactions");
     }
 
-    public void addTransaction(Transaction t) {
+    public void addNewTransaction(Transaction t) {
         collection.insertOne(t.toDocument());
     }
 
@@ -105,7 +105,7 @@ public class TransactionManager {
     }
 
     // UPDATE TRANSACTION, USER CAN INPUT NEW TYPE, AMOUNT, DESCRIPTION AND CATEGORY. ID SAME.
-    public void updateTransaction(Transaction t) {
+    public void updateSelectedTransaction(Transaction t) {
         Document filter = new Document("_id", new ObjectId(t.getId()));
 
         Document updated = new Document("$set", new Document()
